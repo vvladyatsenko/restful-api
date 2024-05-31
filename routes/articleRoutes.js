@@ -1,18 +1,24 @@
 const express = require('express');
-const {
-  getArticles,
-  createArticle,
-  getArticleById,
-  updateArticleById,
-  deleteArticleById,
-} = require('../controllers/articleController');
-
 const router = express.Router();
 
-router.get('/', getArticles);
-router.post('/', createArticle);
-router.get('/:articleId', getArticleById);
-router.put('/:articleId', updateArticleById);
-router.delete('/:articleId', deleteArticleById);
+router.get('/', (req, res) => {
+  res.send('Get articles route');
+});
+
+router.post('/', (req, res) => {
+  res.send('Post articles route');
+});
+
+router.get('/:articleId', (req, res) => {
+  res.send(`Get article by Id route: ${req.params.articleId}`);
+});
+
+router.put('/:articleId', (req, res) => {
+  res.send(`Put article by Id route: ${req.params.articleId}`);
+});
+
+router.delete('/:articleId', (req, res) => {
+  res.send(`Delete article by Id route: ${req.params.articleId}`);
+});
 
 module.exports = router;
