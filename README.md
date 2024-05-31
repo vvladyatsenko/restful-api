@@ -4,7 +4,7 @@
 
 Клонувати репозиторій:
 
-    git clone https://github.com/your-username/express-server.git
+    git clone https://github.com/vvladyatsenko/restful-api.git
 
 Встановити залежності:
 
