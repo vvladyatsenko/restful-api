@@ -1,4 +1,3 @@
-// controllers/articleController.js
 const getArticles = (req, res) => {
   res.send('Get articles route');
 };

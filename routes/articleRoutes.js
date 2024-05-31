@@ -1,4 +1,3 @@
-// routes/articleRoutes.js
 const express = require('express');
 const {
   getArticles,

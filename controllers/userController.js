@@ -1,4 +1,3 @@
-// controllers/userController.js
 const getUsers = (req, res) => {
   res.send('Get users route');
 };
