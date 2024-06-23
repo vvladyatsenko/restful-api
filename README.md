@@ -1,10 +1,12 @@
-# Express Server + Middleware
+# Express Server
+
+Сервер надає маршрути для роботи з користувачами та статтями, дозволяючи виконувати операції читання, створення, оновлення та видалення даних. В сервер інтегровані шаблонізатори PUG та EJS.
 
 ## Встановлення
 
 Клонувати репозиторій:
 
-    git clone https://github.com/vvladyatsenko/restful-api.git
+    git clone https://github.com/vvladyatsenko/restful-api/tree/pug
 
 Встановити залежності:
 
@@ -15,141 +17,95 @@
 ## Запуск сервера
 
 Для запуску сервера використовуйте наступну команду:
-npm run dev
+npm start
 Сервер буде запущено на порту 3000.
 
-* Перевірка головного маршруту
-Запит GET на головний маршрут:
-Відкрийте Postman.
-Створіть новий запит (кнопка "New").
-Виберіть метод GET.
-Введіть URL: http://localhost:3000/.
-Натисніть кнопку Send.
-Ви повинні отримати відповідь "Get root route".
+## Маршрути
 
-"curl -X GET http://localhost:3000/"
+Кореневий маршрут:
+`GET /` Повертає сторінку з оглавленням та навігацією.
+
+Маршрути користувачів:
+`GET /users` Повертає список всіх користувачів.
+`POST /users` Створює нового користувача.
+`GET /users/userId` Повертає інформацію про користувача з вказаним ідентифікатором.
+`PUT /users/userId` Оновлює інформацію про користувача з вказаним ідентифікатором.
+`DELETE /users/userId` Видаляє користувача з вказаним ідентифікатором.
+
+Маршрути статей:
+`GET /articles` Повертає список всіх статей.
+`POST /articles` Створює нову статтю.
+`GET /articles/articleId` Повертає інформацію про статтю з вказаним ідентифікатором.
+`PUT /articles/articleId` Оновлює інформацію про статтю з вказаним ідентифікатором.
+`DELETE /articles/articleId` Видаляє статтю з вказаним ідентифікатором.
+
+*Додані шаблонізатори*
+
+-Для користувачів: PUG
+-Для статей: EJS
+
+## Тестування за допомогою Postman
+
+-Запустіть сервер командою npm start або yarn start.
+-Відкрийте Postman та створіть новий запит.
+-Вкажіть метод запиту, URL та, за необхідності, параметри запиту.
+-Відправте запит на сервер та перегляньте відповідь.
+-Використання curl для перевірки
+
+`-GET-запит для отримання списку користувачів`
+curl -X GET http://localhost:3000/users -H "Authorization: Bearer your-token"
 
 
-* Перевірка маршрутів для користувачів
-Запит GET на маршрут /users:
-Створіть новий запит.
-Виберіть метод GET.
-Введіть URL: http://localhost:3000/users.
-У розділі Headers додайте заголовок Authorization з вашим токеном (наприклад, your-auth-token).
-Натисніть кнопку Send.
-Ви повинні отримати відповідь "Get users route".
-
-"curl -H "Authorization: your-auth-token" -X GET http://localhost:3000/users"
+`POST-запит для створення користувача`
+curl -X POST http://localhost:3000/users \
+-H "Content-Type: application/" \
+-H "Authorization: Bearer your-token" \
+-d '{"username": "newuser", "email": "newuser@example.com"}'
 
 
-- Запит POST на маршрут /users:
-Створіть новий запит.
-Виберіть метод POST.
-Введіть URL: http://localhost:3000/users.
-У розділі Headers додайте заголовок Content-Type зі значенням application/json
-У розділі Headers додайте заголовок Authorization з вашим токеном.
-У розділі Body виберіть raw і JSON.
-Введіть наступне тіло запиту:
+`GET-запит для отримання користувача за ID`
+curl -X GET http://localhost:3000/users/1 -H "Authorization: Bearer your-token"
+
+
+`PUT-запит для оновлення користувача`
+curl -X PUT http://localhost:3000/users/1 \
+-H "Content-Type: application/" \
+-H "Authorization: Bearer your-token" \
+-d '{"username": "updateduser", "email": "updateduser@example.com"}'
+
+
+`DELETE-запит для видалення користувача`
+curl -X DELETE http://localhost:3000/users/1 -H "Authorization: Bearer your-token"
+
+
+*Мідлвари*
+
+`logger` - логгує всі HTTP-запити та відповіді.
+Відкрийте термінал, запустіть сервер та відправте будь-який запит через Postman. В терміналі ви побачите логи запитів та відповідей.
+`errorHandler`
+Обробляє всі помилки, які були передані через next(error). Логгує стек помилки та повертає клієнту відповідь з відповідним статусом та повідомленням.
+`checkArticlesEmpty` та `checkUsersEmpty`
+Перевіряє, чи порожній масив об'єктів: articles (checkArticlesEmpty) або users (checkUsersEmpty). Якщо масив порожній, він відправляє клієнту відповідь з повідомленням "No users found" / "No articles found" зі статусом 200.
+`validateUserData` (для /users)
+Перевіряє дані запиту, щоб переконатися, що в тілі запиту присутні поля "username" та "email", а також введені дані відповідають своїм типам (string, email).
+
+Приклад:
+
 {
   "username": "newuser",
-  "password": "password123"
+  "email": "newuser@example.com"
 }
-Натисніть кнопку Send.
-Ви повинні отримати відповідь "Post users route".
 
-"curl -H "Content-Type: application/json" -H "Authorization: your-auth-token" -X POST -d '{"username": "newuser", "password": "password123"}' http://localhost:3000/users"
+Якщо одне або обидва ці поля відсутні, або введено неправильний тип даних, мідлвар відправляє відповідь з помилкою та статусом 400.
 
+validateArticleData (для /articles)
+Перевіряє дані запиту, щоб переконатися, що в тілі запиту присутні поля "title" та "content".
 
-- Запит GET на маршрут /users/
-Створіть новий запит.
-Виберіть метод GET.
-Введіть URL: http://localhost:3000/users/1 (або інший існуючий ID користувача).
-У розділі Headers додайте заголовок Authorization з вашим токеном.
-Натисніть кнопку Send.
-Ви повинні отримати відповідь "Get user by Id route: 1".
+Приклад:
 
-"curl -H "Authorization: your-auth-token" -X GET http://localhost:3000/users/1"
-
-
-- Запит PUT на маршрут /users/
-Створіть новий запит.
-Виберіть метод PUT.
-Введіть URL: http://localhost:3000/users/1.
-У розділі Headers додайте заголовок Content-Type зі значенням application/json.
-У розділі Headers додайте заголовок Authorization з вашим токеном.
-У розділі Body виберіть raw і JSON.
-Введіть наступне тіло запиту:
-{
-  "username": "updateduser",
-  "password": "newpassword123"
-}
-Натисніть кнопку Send.
-Ви повинні отримати відповідь "Put user by Id route: 1".
-
-"curl -H "Content-Type: application/json" -H "Authorization: your-auth-token" -X PUT -d '{"username": "updateduser", "password": "newpassword123"}' http://localhost:3000/users/1"
-
-
-- Запит DELETE на маршрут /users/
-Створіть новий запит.
-Виберіть метод DELETE.
-Введіть URL: http://localhost:3000/users/1.
-У розділі Headers додайте заголовок Authorization з вашим токеном.
-Натисніть кнопку Send.
-Ви повинні отримати відповідь "Delete user by Id route: 1".
-
-* Перевірка маршрутів для статей
--Запит GET на маршрут /articles:
-Створіть новий запит.
-Виберіть метод GET.
-Введіть URL: http://localhost:3000/articles.
-У розділі Headers додайте заголовок Authorization з вашим токеном.
-Натисніть кнопку Send.
-Ви повинні отримати відповідь "Get articles route".
-
-- Запит POST на маршрут /articles:
-Створіть новий запит.
-Виберіть метод POST.
-Введіть URL: http://localhost:3000/articles.
-У розділі Headers додайте заголовок Content-Type зі значенням application/json.
-У розділі Headers додайте заголовок Authorization з вашим токеном.
-У розділі Body виберіть raw і JSON.
-Введіть наступне тіло запиту:
 {
   "title": "New Article",
-  "content": "This is a new article."
+  "content": "Content of the new article."
 }
-Натисніть кнопку Send.
-Ви повинні отримати відповідь "Post articles route".
 
-- Запит GET на маршрут /articles/
-Створіть новий запит.
-Виберіть метод GET.
-Введіть URL: http://localhost:3000/articles/1 (або інший існуючий ID статті).
-У розділі Headers додайте заголовок Authorization з вашим токеном.
-Натисніть кнопку Send.
-Ви повинні отримати відповідь "Get article by Id route: 1".
-
-- Запит PUT на маршрут /articles/
-Створіть новий запит.
-Виберіть метод PUT.
-Введіть URL: http://localhost:3000/articles/1.
-У розділі Headers додайте заголовок Content-Type зі значенням application/json.
-У розділі Headers додайте заголовок Authorization з вашим токеном.
-У розділі Body виберіть raw і JSON.
-Введіть наступне тіло запиту:
-{
-  "title": "Updated Article",
-  "content": "This is an updated article."
-}
-Натисніть кнопку Send.
-Ви повинні отримати відповідь "Put article by Id route: 1".
-
-- Запит DELETE на маршрут /articles/
-Створіть новий запит.
-Виберіть метод DELETE.
-Введіть URL: http://localhost:3000/articles/1.
-У розділі Headers додайте заголовок Authorization з вашим токеном.
-Натисніть кнопку Send.
-Ви повинні отримати відповідь "Delete article by Id route: 1".
-
-"curl -H "Authorization: your-auth-token" -X DELETE http://localhost:3000/users/1"
+Якщо одне або обидва ці поля відсутні, мідлвар відправляє відповідь з помилкою та статусом 400.
